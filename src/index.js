@@ -12,7 +12,6 @@ searchBox.addEventListener('input', debounce(onSearch, DEBOUNCE_DELAY));
 
 function onSearch(event) {
   const searchQuery = event.target.value.trim();
-  console.clear()
   if (!searchQuery) {
     countryList.innerHTML = '';
     countryInfo.innerHTML = '';
@@ -46,10 +45,14 @@ fetchCountries(searchQuery)
       countryInfo.innerHTML = '';
     })
     .catch(error => {
-      Notiflix.Notify.failure('Oops, there is no country with that name');
+      if (error.resp && error.resp.status === 404) {
+        Notiflix.Notify.failure('Oops, there is no country with that name');
+      } else if (error.message) {
+        Notiflix.Notify.failure('Something went wrong. Please try again later.');
+      }
+      console.error(error);
       countryList.innerHTML = '';
       countryInfo.innerHTML = '';
-      throw error
     });
 }
 
